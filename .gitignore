@@ -1,17 +1,10 @@
-HEAD
 # Compiled class file
 *.class
 
 # Log file
 *.log
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -20,41 +13,34 @@ HEAD
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
-
-HELP.md
+# Maven
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
-.apt_generated
+# Maven Wrapper (IMPORTANT - keep this)
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
 .classpath
-.factorypath
 .project
 .settings
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+# IntelliJ
 .idea
-*.iws
 *.iml
-*.ipr
 
-### NetBeans ###
-/nbproject/private/
+# NetBeans
+/nbproject/
 /nbbuild/
 /dist/
 /nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
- 647ea27 (Initial project setup)
+
+# OS files
+.DS_Store
+Thumbs.db
