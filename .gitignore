@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 HEAD
 # Compiled class file
 *.class
@@ -58,3 +59,54 @@ build/
 ### VS Code ###
 .vscode/
  647ea27 (Initial project setup)
+=======
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven Wrapper
+!.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot configs (IMPORTANT)
+application-*.properties
+
+# IDE
+.classpath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ
+.idea
+*.iml
+
+# NetBeans
+/nbproject/
+/nbbuild/
+/dist/
+/nbdist/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+>>>>>>> 969e7271b02fe338c97669634daef032c81d4fb4
