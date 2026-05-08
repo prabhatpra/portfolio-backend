@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import com.prabhat.portfolio.enums.ContactStatus;
+
 @Data
 @Builder
 public class ResponseDto {
@@ -14,6 +16,6 @@ public class ResponseDto {
     private String email;
     private String subject;
     private String message;
-    private String status;
+    private ContactStatus status;
     private LocalDateTime createdAt;
 }

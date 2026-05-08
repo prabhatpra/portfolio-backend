@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.prabhat.portfolio.dto.RequestDto;
 import com.prabhat.portfolio.dto.ResponseDto;
 import com.prabhat.portfolio.entity.Contact;
+import com.prabhat.portfolio.enums.ContactStatus;
 import com.prabhat.portfolio.exception.ContactException.DuplicateMessageException;
 import com.prabhat.portfolio.exception.ContactException.NotFoundException;
 import com.prabhat.portfolio.exception.ContactException.RateLimitException;
@@ -37,17 +38,17 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public ResponseDto contactUser(RequestDto request) {
 
-        log.info("POST /contactUser API called for email: {}", request.getEmail());
-
         String email = request.getEmail();
 
-        // Rate limit check
+        log.info("Contact request received for email: {}", email);
+
+        // 1. Rate limit check
         if (!rateLimiter.isAllowed(email)) {
             log.warn("Rate limit exceeded for email: {}", email);
             throw new RateLimitException("Too many requests. Try again later.");
         }
 
-        // Duplicate check
+        // 2. Duplicate message check
         boolean duplicate = repository.existsByEmailAndMessage(email, request.getMessage());
 
         if (duplicate) {
@@ -55,7 +56,7 @@ public class ContactServiceImpl implements ContactService {
             throw new DuplicateMessageException("Duplicate message not allowed");
         }
 
-        // Hourly limit check
+        // 3. Hourly limit check
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
 
         long count = repository.countByEmailAndCreatedAtAfter(email, oneHourAgo);
@@ -65,22 +66,22 @@ public class ContactServiceImpl implements ContactService {
             throw new RateLimitException("Only 3 messages allowed per hour");
         }
 
-        log.info("Validation passed for email: {}. Saving contact...", email);
+        log.info("Validation passed for email: {}", email);
 
-        // Save entity
+        // 4. Save contact
         Contact contact = Contact.builder()
                 .name(request.getName())
                 .email(email)
                 .subject(request.getSubject())
                 .message(request.getMessage())
-                .status("NEW")
+                .status(ContactStatus.NEW)
                 .build();
 
         Contact saved = repository.save(contact);
 
         log.info("Contact saved successfully with id: {}", saved.getId());
 
-        // Send email
+        // 5. Send admin email
         emailService.sendContactMail(
                 saved.getName(),
                 saved.getEmail(),
@@ -88,9 +89,19 @@ public class ContactServiceImpl implements ContactService {
                 saved.getMessage()
         );
 
-        log.info("Email sent successfully to: {}", saved.getEmail());
+        log.info("Admin notification email triggered for: {}", email);
 
-        // Response
+        // 6. Send auto reply
+        emailService.sendAutoReply(
+                saved.getName(),
+                saved.getEmail()
+        );
+
+        log.info("Auto-reply email triggered for: {}", email);
+
+        log.info("Contact processing completed successfully for: {}", email);
+
+        // 7. Response
         return ResponseDto.builder()
                 .id(saved.getId())
                 .name(saved.getName())
@@ -98,13 +109,14 @@ public class ContactServiceImpl implements ContactService {
                 .subject(saved.getSubject())
                 .message(saved.getMessage())
                 .status(saved.getStatus())
+                .createdAt(saved.getCreatedAt())
                 .build();
     }
 
     @Override
     public List<ResponseDto> getAllContacts() {
 
-        log.info("GET /contacts API called");
+        log.info("Fetching all contacts");
 
         List<ResponseDto> list = repository.findAll()
                 .stream()
@@ -115,8 +127,8 @@ public class ContactServiceImpl implements ContactService {
                         .subject(c.getSubject())
                         .message(c.getMessage())
                         .status(c.getStatus())
-                        .build()
-                )
+                        .createdAt(c.getCreatedAt())
+                        .build())
                 .toList();
 
         log.info("Total contacts fetched: {}", list.size());
@@ -127,15 +139,13 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public ResponseDto getContactById(Long id) {
 
-        log.info("GET /contacts/{} API called", id);
+        log.info("Fetching contact by id: {}", id);
 
         Contact contact = repository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Contact not found with id: {}", id);
                     return new NotFoundException("Contact not found");
                 });
-
-        log.info("Contact found with id: {}", id);
 
         return ResponseDto.builder()
                 .id(contact.getId())
@@ -144,32 +154,33 @@ public class ContactServiceImpl implements ContactService {
                 .subject(contact.getSubject())
                 .message(contact.getMessage())
                 .status(contact.getStatus())
+                .createdAt(contact.getCreatedAt())
                 .build();
     }
 
     @Override
     public void deleteContact(Long id) {
 
-        log.info("DELETE /contacts/{} API called", id);
+        log.info("Deleting contact id: {}", id);
 
         if (!repository.existsById(id)) {
-            log.error("Delete failed. Contact not found with id: {}", id);
+            log.error("Contact not found for delete: {}", id);
             throw new NotFoundException("Contact not found");
         }
 
         repository.deleteById(id);
 
-        log.info("Contact deleted successfully with id: {}", id);
+        log.info("Contact deleted successfully: {}", id);
     }
 
     @Override
-    public void updateStatus(Long id, String status) {
+    public void updateStatus(Long id, ContactStatus status) {
 
-        log.info("UPDATE status API called for id: {} with status: {}", id, status);
+        log.info("Updating status for id: {} to {}", id, status);
 
         Contact contact = repository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Update failed. Contact not found with id: {}", id);
+                    log.error("Contact not found for update: {}", id);
                     return new NotFoundException("Contact not found");
                 });
 
@@ -177,6 +188,6 @@ public class ContactServiceImpl implements ContactService {
 
         repository.save(contact);
 
-        log.info("Status updated successfully for id: {} to {}", id, status);
+        log.info("Status updated successfully for id: {}", id);
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.prabhat.portfolio.dto.RequestDto;
 import com.prabhat.portfolio.dto.ResponseDto;
+import com.prabhat.portfolio.enums.ContactStatus;
 
 public interface ContactService {
 
@@ -15,6 +16,6 @@ public interface ContactService {
 	
 	void deleteContact(Long id);
 	
-	public void updateStatus(Long id, String status);
+	public void updateStatus(Long id, ContactStatus status);
 
 }
