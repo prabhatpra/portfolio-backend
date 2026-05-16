@@ -6,17 +6,18 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.prabhat.portfolio.entity.Contact;
+import com.prabhat.portfolio.enums.ContactStatus;
 
 public interface ContactRepository extends JpaRepository<Contact, Long> {
 
 	
-	// duplicate message check 
+	
 	boolean existsByEmailAndMessage(
 			
 			String email,
 			String message
 			);
-	// rate limit (count message in time range)
+	
 	
 	
 	long countByEmailAndCreatedAtAfter(
@@ -24,12 +25,12 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 			LocalDateTime time
 			);
 	
-	// user message history (latest first)
+	
 	List<Contact> findByEmailOrderByCreatedAtDesc(
 			String email
 			);
 	
-	List<Contact> findByStatus(String status);
+	List<Contact> findByStatus(ContactStatus status);
 	
 
 	
