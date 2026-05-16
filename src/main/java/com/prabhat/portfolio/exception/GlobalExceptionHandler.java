@@ -132,6 +132,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResource(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        log.debug("No static resource: {}", ex.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+    
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneral(
@@ -144,4 +151,6 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
+    
+    
 }
