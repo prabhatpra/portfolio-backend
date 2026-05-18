@@ -91,17 +91,10 @@ public class ContactServiceImpl implements ContactService {
 
         log.info("Admin notification email triggered for: {}", email);
 
-        // 6. Send auto reply
-        emailService.sendAutoReply(
-                saved.getName(),
-                saved.getEmail()
-        );
-
-        log.info("Auto-reply email triggered for: {}", email);
 
         log.info("Contact processing completed successfully for: {}", email);
 
-        // 7. Response
+        
         return ResponseDto.builder()
                 .id(saved.getId())
                 .name(saved.getName())

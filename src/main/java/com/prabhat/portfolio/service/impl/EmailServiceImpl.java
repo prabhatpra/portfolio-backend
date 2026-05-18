@@ -37,14 +37,6 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    // ---------------- AUTO REPLY ----------------
-    @Async
-    @Override
-    public void sendAutoReply(String name, String email) {
-        log.info("Auto reply skipped (domain not verified): {}", email);
-        // TODO: Enable when domain is verified
-    }
-
     // ---------------- HELPERS ----------------
     private String buildAdminMessage(String name, String email, String subject, String message) {
         return new StringBuilder()
